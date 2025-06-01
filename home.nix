@@ -35,6 +35,10 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
     pkgs.pure-prompt
+    pkgs.ripgrep
+    pkgs.fd
+    pkgs.eza
+    pkgs.fzf
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -50,7 +54,6 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
-    ".config/foo".text = "test text\n";
   };
 
   # Home Manager can also manage your environment variables through
@@ -80,8 +83,37 @@
     enable = true;
     userName = "furon-kuina";
     userEmail = "tenma.edamura@gmail.com";
+    aliases = {
+      s = "status";
+      a = "add";
+      c = "commit";
+      sw = "switch";
+      cb = "switch -c";
+      l = "log";
+      ll = "log --oneline";
+    };
     extraConfig = {
       init.defaultBranch = "main";
+      branch.sort = "committerdate";
+      tag.sort = "version:refname";
+      push = {
+        default = "simple";
+        autoSetupRemote = true;
+        followTags = true;
+      };
+      pull.rebase = true;
+      fetch = {
+        prune = true; 
+        pruneTags = true;
+        all = true;
+      };
+      help.autocorrect = "prompt";
+      commit.verbose = true;
+      rebase = {
+        autoSquash = true;
+        autoStash = true;
+        updateRefs = true;
+      };
     };
   };
 
