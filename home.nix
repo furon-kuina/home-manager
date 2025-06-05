@@ -39,6 +39,9 @@
     pkgs.fd
     pkgs.eza
     pkgs.fzf
+    pkgs.uv
+    pkgs.ruff
+    pkgs.mise
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -124,6 +127,8 @@
     syntaxHighlighting.enable = true;
     initContent = ''
     autoload -U promptinit; promptinit
+    zstyle ':prompt:pure:prompt:error' color 205
+    zstyle ':prompt:pure:prompt:success' color 086
     prompt pure
     '';
   };
