@@ -38,7 +38,6 @@
     pkgs.ripgrep
     pkgs.fd
     pkgs.eza
-    pkgs.fzf
     pkgs.uv
     pkgs.ruff
     pkgs.mise
@@ -77,6 +76,8 @@
   #
   home.sessionVariables = {
     # EDITOR = "emacs";
+    LANG = "en_US.UTF-8";
+    LC_CTYPE = "en_US.UTF-8";
   };
 
   # Let Home Manager install and manage itself.
@@ -125,16 +126,23 @@
     defaultKeymap = "emacs";
     dotDir = ".config/zsh";
     syntaxHighlighting.enable = true;
+    # TODO: define initContent by concatenating configs for each packages
     initContent = ''
     autoload -U promptinit; promptinit
     zstyle ':prompt:pure:prompt:error' color 205
     zstyle ':prompt:pure:prompt:success' color 086
     prompt pure
+    export LOCALE_ARCHIVE="$(nix profile list | grep glibcLocales | tail -n1 | cut -d ' ' -f4)/lib/locale/locale-archive"
     '';
   };
 
   programs.gh = {
     enable = true;
+  };
+
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
   };
 
   # TODO: manage tailscale with Home Manager
