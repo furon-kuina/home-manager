@@ -38,9 +38,9 @@
     pkgs.ripgrep
     pkgs.fd
     pkgs.eza
+    pkgs.zoxide
     pkgs.uv
     pkgs.ruff
-    pkgs.mise
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -133,6 +133,15 @@
     zstyle ':prompt:pure:prompt:success' color 086
     prompt pure
     export LOCALE_ARCHIVE="$(nix profile list | grep glibcLocales | tail -n1 | cut -d ' ' -f4)/lib/locale/locale-archive"
+    export PATH="/home/furon/.local/bin:$PATH"
+
+    switch_branch_fzf() {
+      branch=$(git branch --list --sort=-committerdate | cut -c 3- | fzf --preview "git log --pretty=format:'%h %cd %s' --date=format:'%Y-%m-%d %H:%M' {}")
+      BUFFER="git switch $branch"
+      zle accept-line
+    }
+    zle -N switch_branch_fzf
+    bindkey '^[' switch_branch_fzf
     '';
   };
 
@@ -141,6 +150,11 @@
   };
 
   programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
+  programs.mise = {
     enable = true;
     enableZshIntegration = true;
   };
