@@ -42,6 +42,7 @@
     pkgs.uv
     pkgs.ruff
     pkgs.docker
+    pkgs.ghq
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -120,6 +121,7 @@
         autoStash = true;
         updateRefs = true;
       };
+      ghq.root = "~/Development/repo";
     };
   };
 
@@ -189,6 +191,11 @@
 
   programs.awscli = {
     enable = true;
+  };
+
+  programs.opam = {
+    enable = true;
+    enableZshIntegration = true;
   };
 
   # TODO: manage tailscale with Home Manager
