@@ -13,8 +13,10 @@
   outputs =
     { nixpkgs, home-manager, ... }:
     let
-      system = "x86_64-linux";
+      system = builtins.currentSystem;
       pkgs = nixpkgs.legacyPackages.${system};
+      usernameEnv = builtins.getEnv "USER";
+      homeDirectoryEnv = builtins.getEnv "HOME";
     in
     {
       homeConfigurations."furon" = home-manager.lib.homeManagerConfiguration {
@@ -26,6 +28,10 @@
 
         # Optionally use extraSpecialArgs
         # to pass through arguments to home.nix
+        extraSpecialArgs = {
+          username = usernameEnv;
+          homeDirectory = homeDirectoryEnv;
+        };
       };
     };
 }

@@ -1,10 +1,10 @@
-{ config, pkgs, ... }:
+{ config, pkgs, username, homeDirectory, ... }:
 
 {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
-  home.username = "furon";
-  home.homeDirectory = "/home/furon";
+  home.username = username;
+  home.homeDirectory = homeDirectory;
 
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
@@ -41,6 +41,7 @@
     pkgs.zoxide
     pkgs.uv
     pkgs.ruff
+    pkgs.docker
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
@@ -92,6 +93,7 @@
       a = "add";
       c = "commit";
       sw = "switch";
+      co = "checkout";
       cb = "switch -c";
       l = "log";
       ll = "log --oneline";
@@ -134,14 +136,40 @@
     prompt pure
     export LOCALE_ARCHIVE="$(nix profile list | grep glibcLocales | tail -n1 | cut -d ' ' -f4)/lib/locale/locale-archive"
     export PATH="/home/furon/.local/bin:$PATH"
+    alias tf="terraform"
+    alias fzc="git branch --list | cut -c 3- | fzf --preview \"git log --pretty=format:'%h %cd %s' --date=format:'%Y-%m-%d %H:%M' {}\" | xargs git checkout"
 
     switch_branch_fzf() {
-      branch=$(git branch --list --sort=-committerdate | cut -c 3- | fzf --preview "git log --pretty=format:'%h %cd %s' --date=format:'%Y-%m-%d %H:%M' {}")
-      BUFFER="git switch $branch"
-      zle accept-line
+      local branch
+      # Use git for-each-ref for a more robust way to get branch names
+      branch=$(git for-each-ref --sort=-committerdate refs/heads/ --format='%(refname:short)' | fzf --preview "git log --pretty=format:'%h %cd %s' --date=format:'%Y-%m-%d %H:%M' {}")
+
+      # Only proceed if a branch was selected
+      if [[ -n "$branch" ]]; then
+        BUFFER="git switch $branch"
+        zle accept-line
+      else
+        # If no branch was selected, clear the command line
+        BUFFER=""
+        zle redisplay
+      fi
     }
     zle -N switch_branch_fzf
-    bindkey '^[' switch_branch_fzf
+    bindkey '^b' switch_branch_fzf
+
+    switch_repo_fzf() {
+      local src=$(ghq list | fzf --preview "ls -laTp $(ghq root)/{} | tail -n+4 | awk '{print \$9\"/\"\$6\"/\"\$7 \" \" \$10}'")
+      if [ -n "$src" ]; then
+        BUFFER="cd $(ghq root)/$src"
+        zle accept-line
+      fi
+      zle -R -c
+    }
+    zle -N switch_repo_fzf
+    bindkey '^]' switch_repo_fzf
+
+    eval "$(zoxide init zsh)"
+    eval "$(mise activate zsh)"
     '';
   };
 
@@ -157,6 +185,10 @@
   programs.mise = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  programs.awscli = {
+    enable = true;
   };
 
   # TODO: manage tailscale with Home Manager
