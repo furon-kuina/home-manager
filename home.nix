@@ -43,7 +43,6 @@
     pkgs.ruff
     pkgs.docker
     pkgs.ghq
-    pkgs.asterisk_22
   ];
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage

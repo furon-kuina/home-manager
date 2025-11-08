@@ -12,6 +12,7 @@
 
   outputs =
     { nixpkgs, home-manager, ... }:
+    # All impurity contained
     let
       system = builtins.currentSystem;
       pkgs = nixpkgs.legacyPackages.${system};
